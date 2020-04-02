@@ -25,11 +25,11 @@ public class PlayerController : MonoBehaviour
         MoveController();
         if (Input.GetMouseButtonDown(0))
         {
-            FirePink();
+            StartCoroutine(FirePink());
         }
         if (Input.GetMouseButtonDown(1))
         {
-            FireGreen();
+            StartCoroutine(FireGreen());
         }
         
     }
@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
         pos.z = staticObject.position.z;
         playerTransform.position = cam.ScreenToWorldPoint(pos);
     }
-    public void FirePink()
+    public IEnumerator FirePink()
     {
         aimReticle.color = new Color32(255, 0, 255, 255);
         var pinkRay = cam.ScreenPointToRay(Input.mousePosition);
@@ -49,23 +49,30 @@ public class PlayerController : MonoBehaviour
             Debug.Log(hit.collider.gameObject.name);
             if (hit.collider.gameObject.CompareTag("Pink"))
             {
-                hit.collider.gameObject.GetComponent<MoveAsteroid>().SetVariables();
+                hit.collider.gameObject.GetComponent<AudioSource>().Play();
+                hit.collider.gameObject.GetComponent<ParticleSystem>().Play();
+                yield return new WaitForSeconds(0.1f);
+                hit.collider.gameObject.GetComponent<MoveAsteroid>().StartCoroutine("SetVariables");
                 currScore += 1;
                 scoreText.text = "Asteroids Destroyed:" + currScore;
             }
             
         }
     }
-    public void FireGreen()
+    public IEnumerator FireGreen()
     {
         aimReticle.color = new Color32(0, 255, 0, 255);
         var greenRay = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(greenRay, out hit) && (hit.transform.gameObject.CompareTag("Green")))
         {
-            hit.collider.gameObject.GetComponent<MoveAsteroid>().SetVariables();
+            hit.collider.gameObject.GetComponent<AudioSource>().Play();
+            hit.collider.gameObject.GetComponent<ParticleSystem>().Play();
+            yield return new WaitForSeconds(0.1f);
+            hit.collider.gameObject.GetComponent<MoveAsteroid>().StartCoroutine("SetVariables");
             currScore += 1;
             scoreText.text = "Asteroids Destroyed:" + currScore;
+            yield return true;
         }
     }
     

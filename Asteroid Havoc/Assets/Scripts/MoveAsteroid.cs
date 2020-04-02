@@ -8,9 +8,10 @@ public class MoveAsteroid : MonoBehaviour
     private float speed;
     public GameObject asteroidManager;
     private Vector3 offset;
-    public float offsetRange;
+    public Vector3 offsetRange;
     public float minSpeed;
     public float maxSpeed;
+    private ParticleSystem MPS;
     public Material[] materialColor;
 
 
@@ -18,7 +19,8 @@ public class MoveAsteroid : MonoBehaviour
     private Material currentMaterial;
     void Start()
     {
-        SetVariables();
+        MPS = GetComponent<ParticleSystem>();
+        StartCoroutine(SetVariables());
     }
 
     // Update is called once per frame
@@ -27,23 +29,23 @@ public class MoveAsteroid : MonoBehaviour
         transform.Translate(Vector3.forward * Time.deltaTime * speed);
        
     }
-    private void OnTriggerEnter(Collider other)
+  
+    public IEnumerator SetVariables()
     {
-        SetVariables();
-    }
-    public void SetVariables()
-    {
-        offset = new Vector3(Random.Range(offsetRange, -offsetRange), Random.Range(offsetRange, -offsetRange), Random.Range(offsetRange, -offsetRange));
+        offset = new Vector3(Random.Range(offsetRange.x, -offsetRange.x), Random.Range(offsetRange.y, -offsetRange.y), Random.Range(offsetRange.z, -offsetRange.z));
         transform.position = asteroidManager.transform.position + offset;
         speed = Random.Range(minSpeed, maxSpeed);
         int whichColor = Random.Range(0, 99);
         var thisRenderer = gameObject.GetComponent<Renderer>();
+        ParticleSystem.MainModule myParticle = MPS.main;
         if (whichColor < 50)
         {
             Debug.Log(whichColor);
             gameObject.tag = "Pink";
             currentMaterial = materialColor[0];
             thisRenderer.material = currentMaterial;
+            myParticle.startColor = new Color(255, 0, 255, 255);
+            yield return true;
         }
         else if (whichColor >= 50)
         {
@@ -51,6 +53,8 @@ public class MoveAsteroid : MonoBehaviour
             gameObject.tag = "Green";
             currentMaterial = materialColor[1];
             thisRenderer.material = currentMaterial;
+            myParticle.startColor = new Color(0, 255, 0, 255);
+            yield return true;
         }
         
     }
